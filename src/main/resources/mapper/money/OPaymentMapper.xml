@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.trkj.fanpu.dao.money.OPaymentMapper">
+
+    <resultMap id="selectOPayment" type="CwOPayment">
+        <id column="opay_id" property="opayId"/>
+        <result column="opay_details" property="opayDetails"/>
+        <result column="opay_amount" property="opayAmount"/>
+        <result column="opay_date" property="opayDate"/>
+        <result column="opay_status" property="opayStatus"/>
+        <result column="remark" property="remark"/>
+        <association property="rsStaff" javaType="RsStaff">
+            <id column="staff_id" property="staffId"/>
+            <result column="staff_name" property="staffName"/>
+        </association>
+    </resultMap>
+
+    <select id="selectCwOPaymentByPaymentVo" parameterType="com.trkj.fanpu.vo.PaymentVo" resultMap="selectOPayment">
+        select * from cw_opayment op inner join rs_staff st on op.staff_id = st.staff_id
+        <where>
+            <if test="staffName != null and staffName != ''">
+                and st.staff_name like concat('%',#{staffName},'%')
+            </if>
+            <if test="opayStatus != null">
+                and op.opay_status = #{opayStatus}
+            </if>
+            <if test="payAmountStart != null ">
+                and op.opay_amount &gt;= #{payAmountStart}
+            </if>
+            <if test="payAmountEnd != null ">
+                and op.opay_amount &lt;= #{payAmountEnd}
+            </if>
+        </where>
+        order by field(opay_status ,1,2,3), op.opay_id asc
+    </select>
+
+
+    <insert id="insertOPayment" parameterType="com.trkj.fanpu.vo.OPaymentInVo" keyProperty="opayId" useGeneratedKeys="true">
+        insert into cw_opayment(opay_details, staff_id, opay_amount, opay_date, opay_status, remark)
+            values (#{opayDetails},#{staffId},#{opayAmount},#{opayDate},#{opayStatus},#{remark})
+    </insert>
+
+    <update id="updateOPayment" parameterType="com.trkj.fanpu.vo.OPaymentInVo">
+        update cw_opayment
+        <set>
+            <if test="opayDetails != null and opayDetails != ''">
+                opay_details = #{opayDetails},
+            </if>
+            <if test="staffId != null">
+                staff_id = #{staffId},
+            </if>
+            <if test="opayAmount != null">
+                opay_amount = #{opayAmount},
+            </if>
+            <if test="opayDate != null">
+                opay_date = #{opayDate},
+            </if>
+            <if test="opayStatus != null">
+                opay_status = #{opayStatus},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark}
+            </if>
+        </set>
+
+        <where>
+            opay_id = #{opayId}
+        </where>
+    </update>
+
+
+</mapper>

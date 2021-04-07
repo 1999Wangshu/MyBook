@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.trkj.fanpu.dao.money.ReceiptsMapper">
+
+    <resultMap id="selectReceipts" type="CwReceipts">
+        <id column="receipts_id" property="receiptsId"/>
+        <result column="receipts_name" property="receiptsName"/>
+        <result column="con_amount" property="conAmount"/>
+        <result column="receipts_amount" property="receiptsAmount"/>
+        <result column="receipts_date" property="receiptsDate"/>
+        <result column="receipts_type" property="receiptsType"/>
+        <result column="receipts_status" property="receiptsStatus"/>
+        <result column="remark" property="remark"/>
+        <association property="contract" javaType="CwContract">
+            <id column="con_id" property="conId"/>
+            <result column="con_name" property="conName"/>
+            <result column="con_amount" property="conAmount"/>
+            <result column="deposit" property="deposit"/>
+            <result column="con_date" property="conDate"/>
+            <result column="start_date" property="startDate"/>
+            <result column="end_date" property="endDate"/>
+            <result column="signed" property="signed"/>
+            <result column="con_status" property="conStatus"/>
+            <result column="remark" property="remark"/>
+            <association property="projectEstablish" javaType="ProjectEstablish">
+                <id column="pro_id" property="proId"/>
+                <result column="pro_name" property="proName"/>
+            </association>
+        </association>
+
+        <association property="rsStaff" javaType="RsStaff">
+            <id column="staff_id" property="staffId"/>
+            <result column="staff_name" property="staffName"/>
+        </association>
+    </resultMap>
+
+    <select id="selectReceiptsByReceiptsVo" parameterType="com.trkj.fanpu.vo.ReceiptsVo" resultMap="selectReceipts">
+
+        select * from cw_receipts re ,cw_contract co,rs_staff st,project_establish pro
+            where re.con_id =co.con_id and re.staff_id = st.staff_id and co.pro_id= pro.pro_id
+            <if test="receiptsName !=null and receiptsName !=''" >
+                and re.receipts_name like concat('%',#{receiptsName},'%')
+            </if>
+            <if test="conName !=null and conName !=''" >
+                and co.con_name like concat('%',#{conName},'%')
+            </if>
+            <if test="staffName != null and staffName != ''">
+                and st.staff_name like concat('%',#{staffName},'%')
+            </if>
+            <if test="receiptsStatus != null">
+                and re.receipts_status = #{receiptsStatus}
+            </if>
+            <if test="receiptsAmountStart != null ">
+                and re.receipts_amount &gt;= #{receiptsAmountStart}
+            </if>
+            <if test="receiptsAmountEnd != null ">
+                and re.receipts_amount &lt;= #{receiptsAmountEnd}
+            </if>
+            <if test="startDate != null ">
+                and re.receipts_date &lt;= #{startDate}
+            </if>
+            <if test="endDate != null ">
+                and re.receipts_date &lt;= #{endDate}
+            </if>
+        order by re.receipts_status,re.receipts_amount desc
+    </select>
+
+
+    <insert id="insertReceipts" parameterType="com.trkj.fanpu.vo.ReceiptsInVo" keyProperty="receiptsId" useGeneratedKeys="true">
+        insert into cw_receipts(con_id, receipts_name, con_amount, receipts_amount, staff_id, receipts_date, receipts_type, receipts_status, remark)
+            VALUES(#{conId},#{receiptsName},#{conAmount},#{receiptsAmount},#{staffId},#{receiptsDate},#{receiptsType},#{receiptsStatus},#{remark})
+    </insert>
+</mapper>

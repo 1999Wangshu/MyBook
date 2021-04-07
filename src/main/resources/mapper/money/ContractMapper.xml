@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.trkj.fanpu.dao.money.ContractMapper">
+
+    <resultMap id="selectContract" type="CwContract">
+        <id column="con_id" property="conId"/>
+        <result column="con_name" property="conName"/>
+        <result column="con_amount" property="conAmount"/>
+        <result column="deposit" property="deposit"/>
+        <result column="con_date" property="conDate"/>
+        <result column="start_date" property="startDate"/>
+        <result column="end_date" property="endDate"/>
+        <result column="signed" property="signed"/>
+        <result column="con_status" property="conStatus"/>
+        <result column="remark" property="remark"/>
+        <association property="projectEstablish" javaType="ProjectEstablish">
+            <id column="pro_id" property="proId"/>
+            <result column="pro_name" property="proName"/>
+        </association>
+    </resultMap>
+    
+    <select id="selectContractByContractVo" parameterType="com.trkj.fanpu.vo.ContractVo" resultMap="selectContract">
+        select * from cw_contract co, project_establish pro
+        where co.pro_id = pro.pro_id
+        <if test="conName != null and conName != ''">
+            and con_name like concat('%',#{conName},'%')
+        </if>
+
+    </select>
+
+</mapper>

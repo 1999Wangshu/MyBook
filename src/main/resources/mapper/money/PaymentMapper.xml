@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.trkj.fanpu.dao.money.PaymentMapper">
+
+    <resultMap id="selectPayment" type="CwPayment">
+        <id column="pay_id" property="payId"/>
+        <result property="conId" column="con_id"/>
+        <result column="pay_name" property="payName"/>
+        <result column="con_amount" property="conAmount"/>
+        <result column="pay_amount" property="payAmount"/>
+        <result column="fine" property="fine"/>
+        <result column="deduction" property="deduction"/>
+        <result column="staff_id" property="staffId"/>
+        <result column="opay_date" property="opayDate"/>
+        <result column="pay_type" property="payType"/>
+        <result column="opay_status" property="opayStatus"/>
+        <result column="remark" property="remark"/>
+        <association property="contract" javaType="CwContract">
+            <id column="con_id" property="conId"/>
+            <result column="con_name" property="conName"/>
+            <result column="con_amount" property="conAmount"/>
+            <result column="deposit" property="deposit"/>
+            <result column="con_date" property="conDate"/>
+            <result column="start_date" property="startDate"/>
+            <result column="end_date" property="endDate"/>
+            <result column="signed" property="signed"/>
+            <result column="con_status" property="conStatus"/>
+            <result column="remark" property="remark"/>
+            <association property="projectEstablish" javaType="ProjectEstablish">
+                <id column="pro_id" property="proId"/>
+                <result column="pro_name" property="proName"/>
+            </association>
+        </association>
+
+        <association property="rsStaff" javaType="RsStaff">
+            <id column="staff_id" property="staffId"/>
+            <result column="staff_name" property="staffName"/>
+        </association>
+        
+    </resultMap>
+
+    <select id="selectPaymentAll" parameterType="com.trkj.fanpu.vo.PaymentVo" resultMap="selectPayment">
+        select * from cw_payment pa,cw_contract co,rs_staff st,project_establish pro
+        where pa.con_id =co.con_id and pa.staff_id = st.staff_id and co.pro_id= pro.pro_id
+        <if test="payName !=null and payName !=''" >
+            and pa.pay_name like concat('%',#{payName},'%')
+        </if>
+        <if test="conName !=null and conName !=''" >
+            and co.con_name like concat('%',#{conName},'%')
+        </if>
+        <if test="staffName != null and staffName != ''">
+            and st.staff_name like concat('%',#{staffName},'%')
+        </if>
+        <if test="opayStatus != null">
+            and pa.opay_status = #{opayStatus}
+        </if>
+        <if test="payAmountStart != null ">
+            and pa.pay_amount &gt;= #{payAmountStart}
+        </if>
+        <if test="payAmountEnd != null ">
+            and pa.pay_amount &lt;= #{payAmountEnd}
+        </if>
+        order by pa.opay_status asc,pa.pay_id
+
+    </select>
+
+    <insert id="insertPayment" parameterType="com.trkj.fanpu.vo.PaymentInVo" keyProperty="payId" useGeneratedKeys="true">
+        insert into cw_payment(con_id, pay_name, con_amount, pay_amount, fine, deduction, opay_date, staff_id, pay_type, opay_status, remark)
+            values (#{conId},#{payName},#{conAmount},#{payAmount},#{fine},#{deduction},#{opayDate},#{staffId},#{payType},#{oPayStatus},#{remark})
+    </insert>
+
+    <update id="updatePayment" parameterType="com.trkj.fanpu.vo.PaymentInVo">
+        update cw_payment
+        <set>
+            <if test="conId != null and conId != ''">
+                con_id = #{conId},
+            </if>
+            <if test="payName != null and payName != ''">
+                pay_name = #{payName},
+            </if>
+            <if test="conAmount != null">
+                con_amount = #{conAmount},
+            </if>
+            <if test="payAmount != null">
+                pay_amount = #{payAmount},
+            </if>
+            <if test="fine != null">
+                fine = #{fine},
+            </if>
+            <if test="deduction != null">
+                deduction = #{deduction},
+            </if>
+            <if test="opayDate != null">
+                opay_date =#{opayDate},
+            </if>
+            <if test="staffId != null">
+                staff_id = #{staffId},
+            </if>
+            <if test="payType != null">
+                pay_type = #{payType},
+            </if>
+            <if test="OPayStatus != null">
+                opay_status = #{oPayStatus},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark},
+            </if>
+        </set>
+        <where>
+            <if test="payId != null">
+                pay_id = #{payId}
+            </if>
+        </where>
+    </update>
+
+
+</mapper>

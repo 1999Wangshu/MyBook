@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.trkj.fanpu.dao.money.RsStaffMapper">
+    <resultMap id="getRsStaffMap" type="com.trkj.fanpu.entity.RsStaff">
+        <id column="staff_id" property="staffId"/>
+        <result column="staff_num" property="staffNum"/>
+        <result column="staff_pwd" property="staffPwd"/>
+        <result column="staff_name" property="staffName"/>
+        <result column="staff_sex" property="staffSex"/>
+        <result column="staff_phone" property="staffPhone"/>
+        <result column="staff_idcard" property="staffIdcard"/>
+        <result column="staff_state" property="staffState"/>
+        <result column="staff_type" property="staffType"/>
+        <result column="entry_time" property="entryTime"/>
+        <result column="staff_email" property="staffEmail"/>
+        <result column="marriage_state" property="marriageState"/>
+        <result column="education" property="education"/>
+        <result column="staff_nation" property="staffNation"/>
+        <result column="staff_birthday" property="staffBirthday"/>
+        <result column="political_outlook" property="politicalOutlook"/>
+        <result column="major" property="major"/>
+        <result column="home_address" property="homeAddress"/>
+    </resultMap>
+
+    <!-- 查询所有员工信息 -->
+    <select id="getRsStaffAll" resultMap="getRsStaffMap" parameterType="com.trkj.fanpu.vo.ParamVo">
+        select * from rs_staff rf
+        where 1=1
+
+        <if test="name != null and name != ''">
+            AND rf.staff_name like concat('%',#{name},'%')
+        </if>
+
+            AND rf.staff_state = '在职'
+        ORDER BY rf.entry_time DESC
+    </select>
+
+
+
+
+    <!-- 新增员工-->
+    <insert id="addStaff" useGeneratedKeys="true" keyProperty="rsStaff.staffId">
+        insert into rs_staff values (null,#{deptId},#{positionId},#{rsStaff.staffNum},
+                                     #{rsStaff.staffPwd},#{rsStaff.staffName},#{rsStaff.staffSex},#{rsStaff.staffPhone},#{rsStaff.staffIdcard},
+                                     #{rsStaff.staffState},#{rsStaff.staffType},#{rsStaff.entryTime},#{rsStaff.staffEmail},
+                                     #{rsStaff.marriageState},#{rsStaff.education},#{rsStaff.staffNation},#{rsStaff.staffBirthday},#{rsStaff.politicalOutlook},
+                                     #{rsStaff.major},#{rsStaff.homeAddress})
+    </insert>
+
+
+    <!-- 修改员工信息 -->
+    <update id="updateStaffById">
+        update rs_staff set dept_id=#{deptId},position_id=#{positionId},staff_num=#{rsStaff.staffNum},
+                            staff_pwd=#{rsStaff.staffPwd},staff_name=#{rsStaff.staffName},staff_sex=#{rsStaff.staffSex},staff_phone=#{rsStaff.staffPhone},staff_idcard=#{rsStaff.staffIdcard},
+                            staff_state=#{rsStaff.staffState},staff_type=#{rsStaff.staffType},entry_time=#{rsStaff.entryTime},staff_email=#{rsStaff.staffEmail},
+                            marriage_state=#{rsStaff.marriageState},education=#{rsStaff.education},staff_nation=#{rsStaff.staffNation},staff_birthday=#{rsStaff.staffBirthday},political_outlook=#{rsStaff.politicalOutlook},
+                            major=#{rsStaff.major},home_address=#{rsStaff.homeAddress}
+        where staff_id=#{rsStaff.staffId}
+    </update>
+
+</mapper>

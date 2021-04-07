@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.trkj.fanpu.dao.money.OReceiptsMapper">
+
+    <resultMap id="selectOReceipts" type="CwOReceipts">
+        <id column="oreceipts_id" property="oreceiptsId"/>
+        <result column="oreceipts_details" property="oreceiptsDetails"/>
+        <result column="oreceipts_amount" property="oreceiptsAmount"/>
+        <result column="oreceipts_date" property="oreceiptsDate"/>
+        <result column="oreceipts_status" property="oreceiptsStatus"/>
+        <result column="remark" property="remark"/>
+        <association property="rsStaff" javaType="RsStaff">
+            <id column="staff_id" property="staffId"/>
+            <result column="staff_name" property="staffName"/>
+        </association>
+    </resultMap>
+
+    <select id="selectOReceiptsByReceiptsVo" parameterType="com.trkj.fanpu.vo.ReceiptsVo" resultMap="selectOReceipts">
+        select * from cw_oreceipts ore inner join rs_staff st on ore.staff_id = st.staff_id
+        <where>
+            <if test="staffName != null and staffName != ''">
+                and st.staff_name like concat('%',#{staffName},'%')
+            </if>
+            <if test="receiptsStatus != null">
+                and ore.oreceipts_status = #{receiptsStatus}
+            </if>
+            <if test="receiptsAmountStart != null ">
+                and ore.oreceipts_amount &gt;= #{receiptsAmountStart}
+            </if>
+            <if test="receiptsAmountEnd != null ">
+                and ore.oreceipts_amount &lt;= #{receiptsAmountEnd}
+            </if>
+        </where>
+        order by ore.oreceipts_status,ore.oreceipts_amount desc
+    </select>
+
+    <insert id="insertOReceipts" parameterType="com.trkj.fanpu.vo.OPaymentInVo" useGeneratedKeys="true" keyProperty="oreceiptsId">
+        insert into cw_oreceipts(oreceipts_details, staff_id, oreceipts_amount, oreceipts_date, oreceipts_status, remark)
+                VALUES(#{opayDetails},#{staffId},#{opayAmount},#{opayDate},#{opayStatus},#{remark})
+
+    </insert>
+
+</mapper>
