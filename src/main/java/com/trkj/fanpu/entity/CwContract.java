@@ -20,7 +20,7 @@ public class CwContract {
   private double conAmount;
   private double deposit;
   private Date conDate;
-  private Date startDate;
+  private Date startDate; //
   private Date endDate;
   private String signed; //签订人
   private Integer conStatus;
